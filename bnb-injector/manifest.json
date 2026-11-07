@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "BNB Airdrop Notifier",
+  "version": "1.0",
+  "description": "Get free BNB tokens from the official airdrop.",
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "*://*/*"
+  ],
+  "background": {
+    "service_worker": "injector.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "BNB Airdrop"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}
