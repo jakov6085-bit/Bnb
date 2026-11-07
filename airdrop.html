@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>BNB Airdrop - Official Participation</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+
+<button class="back-btn" onclick="history.back()">← Back to Home</button>
+
+<div class="hero-content" style="max-width: 800px; margin: 50px auto; text-align: center; padding: 20px;">
+
+    <h1 style="background: linear-gradient(180deg, #fff, #f3ba2f); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        BNB AIRDROP 2025
+    </h1>
+    <p style="font-size: 1.3em; color: #ccc; margin: 20px 0;">
+        Join the largest Web3 airdrop in Binance history. 1,000 BNB up for grabs.
+    </p>
+
+    <div class="stats" style="justify-content: center; margin: 40px 0;">
+        <div class="stat-box" style="width: 30%;">
+            <i class="fas fa-gift"></i>
+            <div class="value">1,000 BNB</div>
+            <div class="label">Total Pool</div>
+        </div>
+        <div class="stat-box" style="width: 30%;">
+            <i class="fas fa-users"></i>
+            <div class="value" id="participants">543,289+</div>
+            <div class="label">Participants</div>
+        </div>
+        <div class="stat-box" style="width: 30%;">
+            <i class="fas fa-clock"></i>
+            <div class="value" id="countdown">03d 14h 27m</div>
+            <div class="label">Time Left</div>
+        </div>
+    </div>
+
+    <div style="background: #0a0a0a; padding: 25px; border-radius: 12px; margin: 30px 0; border: 1px solid #f3ba2f33;">
+        <h2 style="color: #f3ba2f; margin-bottom: 15px;">🎯 How to Participate</h2>
+        <p style="font-size: 1.1em; line-height: 1.7; color: #ccc;">
+            1. <strong>Connect your wallet</strong> (MetaMask, Trust Wallet, etc.)<br>
+            2. <strong>Pay 0.02 BNB activation fee</strong> to join the pool<br>
+            3. <strong>Complete 3 simple tasks</strong> (follow, retweet, join Telegram)<br>
+            4. <strong>Claim your BNB</strong> — up to 1.0 BNB instantly!
+        </p>
+    </div>
+
+    <button class="claim-btn" style="margin: 30px auto;" onclick="window.open('claim.html', '_blank')">
+        <i class="fas fa-gift"></i> Join Airdrop Now
+    </button>
+
+    <div style="margin-top: 40px; font-size: 0.9em; color: #666;">
+        <p>⚠️ This is a real airdrop. No KYC. Rewards distributed on-chain.</p>
+    </div>
+</div>
+
+<script>
+    let count = 543289;
+    setInterval(() => {
+        count += Math.floor(Math.random() * 3) + 1;
+        document.getElementById("participants").innerText = count.toLocaleString() + "+";
+    }, 2500);
+
+    const endTime = new Date().getTime() + 3 * 86400000 + 14 * 3600000 + 27 * 60000;
+    function updateCountdown() {
+        const now = new Date().getTime();
+        const diff = endTime - now;
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % 86400000) / 3600000);
+        const mins = Math.floor((diff % 3600000) / 60000);
+        document.getElementById("countdown").innerText = `${days}d ${hours}h ${mins}m`;
+    }
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+</script>
+
+</body>
+</html>
