@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>BNB Airdrop FAQ</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .faq-item {
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .faq-question {
+            background: var(--card);
+            padding: 15px 20px;
+            font-size: 1.2em;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--gold);
+        }
+        .faq-answer {
+            background: #0f0f0f;
+            color: #ccc;
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .faq-answer.show {
+            padding: 20px;
+            max-height: 500px;
+        }
+        .faq-question::after {
+            content: '+';
+            font-size: 1.4em;
+        }
+        .faq-question.active::after {
+            content: '−';
+        }
+    </style>
+</head>
+<body>
+
+<button class="back-btn" onclick="history.back()">← Back to Home</button>
+
+<div style="max-width: 800px; margin: 50px auto; padding: 20px;">
+
+    <h1 style="text-align: center; background: linear-gradient(180deg, #fff, #f3ba2f); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 50px;">
+        FREQUENTLY ASKED QUESTIONS
+    </h1>
+
+    <div class="faq-item">
+        <div class="faq-question" onclick="toggle(this)">What is the BNB Airdrop 2025?</div>
+        <div class="faq-answer">
+            <p>The BNB Airdrop 2025 is an official Web3 campaign by Binance to distribute 1,000 BNB to active community members. Participation is free, but a 0.02 BNB activation fee is required to prevent bots.</p>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-question" onclick="toggle(this)">How do I claim my BNB?</div>
+        <div class="faq-answer">
+            <p>Connect your wallet, pay the 0.02 BNB activation fee, complete 3 simple tasks (follow, retweet, join Telegram), and your reward will be sent instantly to your wallet.</p>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-question" onclick="toggle(this)">Is there KYC?</div>
+        <div class="faq-answer">
+            <p>No. This is a fully decentralized airdrop. No personal information is required. Your wallet address is your identity.</p>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-question" onclick="toggle(this)">When will I receive my BNB?</div>
+        <div class="faq-answer">
+            <p>Most users receive their BNB within 2 minutes of completing the tasks. Transactions are processed on-chain via smart contract.</p>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-question" onclick="toggle(this)">Which wallets are supported?</div>
+        <div class="faq-answer">
+            <p>MetaMask, Trust Wallet, Coinbase Wallet, SafePal, TokenPocket, and all Web3-compatible wallets on desktop and mobile.</p>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-question" onclick="toggle(this)">Can I participate from my phone?</div>
+        <div class="faq-answer">
+            <p>Yes. The airdrop is fully mobile-optimized. Just open the site in your phone’s browser and connect using Trust Wallet or MetaMask.</p>
+        </div>
+    </div>
+
+    <button class="claim-btn" style="margin: 50px auto;" onclick="window.open('claim.html', '_blank')">
+        <i class="fas fa-question-circle"></i> Still Have Questions? Claim Now
+    </button>
+
+</div>
+
+<script>
+    function toggle(el) {
+        el.classList.toggle("active");
+        const answer = el.nextElementSibling;
+        answer.classList.toggle("show");
+    }
+</script>
+
+</body>
+</html>
