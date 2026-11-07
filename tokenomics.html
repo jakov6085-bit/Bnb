@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>BNB Airdrop Tokenomics</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<button class="back-btn" onclick="history.back()">← Back to Home</button>
+
+<div style="max-width: 1000px; margin: 60px auto; padding: 20px;">
+
+    <h1 style="text-align: center; background: linear-gradient(180deg, #fff, #f3ba2f); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 50px;">
+        TOKENOMICS
+    </h1>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 40px; align-items: center; justify-content: center; margin-bottom: 60px;">
+
+        <div style="width: 400px; height: 400px; position: relative;">
+            <canvas id="tokenChart"></canvas>
+        </div>
+
+        <div style="flex: 1; min-width: 300px; color: #ccc;">
+            <h3 style="color: #f3ba2f; margin-bottom: 20px;">Distribution Breakdown</h3>
+            <ul style="line-height: 2; font-size: 1.1em;">
+                <li><strong>50% — Airdrop Rewards</strong> (500 BNB)</li>
+                <li><strong>20% — Community Incentives</strong> (200 BNB)</li>
+                <li><strong>15% — Development Team</strong> (150 BNB)</li>
+                <li><strong>10% — Marketing & Partnerships</strong> (100 BNB)</li>
+                <li><strong>5% — Liquidity Pool</strong> (50 BNB)</li>
+            </ul>
+            <p style="margin-top: 20px; font-size: 0.9em;">
+                All tokens distributed via smart contract. <br>
+                Contract: <code style="color: #00ff00;">0x...d33d</code>
+            </p>
+        </div>
+
+    </div>
+
+    <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin: 40px 0;">
+        <div style="background: #0a0a0a; padding: 20px; border-radius: 10px; width: 220px; text-align: center; border: 1px solid #f3ba2f33;">
+            <i class="fas fa-gift" style="font-size: 2.5em; color: #f3ba2f; margin-bottom: 10px;"></i>
+            <h4>Total Airdrop</h4>
+            <p style="color: #00ff00;">1,000 BNB</p>
+        </div>
+        <div style="background: #0a0a0a; padding: 20px; border-radius: 10px; width: 220px; text-align: center; border: 1px solid #f3ba2f33;">
+            <i class="fas fa-trophy" style="font-size: 2.5em; color: #f3ba2f; margin-bottom: 10px;"></i>
+            <h4>Max per User</h4>
+            <p style="color: #00ccff;">1.0 BNB</p>
+        </div>
+        <div style="background: #0a0a0a; padding: 20px; border-radius: 10px; width: 220px; text-align: center; border: 1px solid #f3ba2f33;">
+            <i class="fas fa-network-wired" style="font-size: 2.5em; color: #f3ba2f; margin-bottom: 10px;"></i>
+            <h4>Blockchain</h4>
+            <p style="color: #00ff00;">BNB Smart Chain</p>
+        </div>
+    </div>
+
+    <button class="claim-btn" style="margin: 50px auto;" onclick="window.open('claim.html', '_blank')">
+        <i class="fas fa-chart-pie"></i> Join Airdrop
+    </button>
+
+</div>
+
+<script>
+    const ctx = document.getElementById('tokenChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Airdrop', 'Community', 'Team', 'Marketing', 'Liquidity'],
+            datasets: [{
+                data: [50, 20, 15, 10, 5],
+                backgroundColor: ['#f3ba2f', '#00ccff', '#00ff00', '#ff3333', '#999'],
+                borderWidth: 2,
+                borderColor: '#000'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom', labels: { color: '#ccc' } }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
