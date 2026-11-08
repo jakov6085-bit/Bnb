@@ -6,7 +6,6 @@
     <title>BNB AIRDROP 2025 — Live Global Distribution</title>
     <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fflate@0.7.4/dist/fflate.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
@@ -161,22 +160,6 @@
             align-items: center;
             gap: 10px;
         }
-        .tx-popup {
-            position: absolute;
-            background: rgba(0,0,0,0.9);
-            border: 1px solid var(--green);
-            border-radius: 8px;
-            padding: 10px 15px;
-            color: var(--green);
-            font-size: 0.9em;
-            z-index: 1000;
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .tx-popup.show {
-            opacity: 1;
-        }
         .features {
             display: flex;
             justify-content: space-around;
@@ -276,122 +259,20 @@
 </section>
 
 <script>
-    // === 3D GLOBE ===
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.getElementById("globe-container").appendChild(renderer.domElement);
 
-    // Earth
     const geometry = new THREE.SphereGeometry(5, 64, 64);
     const textureLoader = new THREE.TextureLoader();
     const earthTexture = textureLoader.load("https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_atmos_2048.jpg");
-    const bumpMap = textureLoader.load("https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_normal_2048.jpg");
-    const material = new THREE.MeshPhongMaterial({
-        map: earthTexture,
-        bumpMap: bumpMap,
-        bumpScale: 0.05,
-        specular: new THREE.Color(0x333333)
-    });
+    const material = new THREE.MeshPhongMaterial({ map: earthTexture });
     const earth = new THREE.Mesh(geometry, material);
     scene.add(earth);
 
-    // Glow
-    const glowGeometry = new THREE.SphereGeometry(5.1, 64, 64);
-    const glowMaterial = new THREE.MeshBasicMaterial({
-        color: 0x00aaff,
-        transparent: true,
-        opacity: 0.2
-    });
-    const glow = new THREE.Mesh(glowGeometry, glowMaterial);
-    scene.add(glow);
-
     camera.position.z = 8;
-
-    // Cities (glowing points)
-    const cities = [
-        { lat: 40.7128, lon: -74.0060, name: "New York" },    // USA
-        { lat: 35.6895, lon: 139.6917, name: "Tokyo" },       // Japan
-        { lat: 51.5074, lon: -0.1278, name: "London" },       // UK
-        { lat: 48.8566, lon: 2.3522, name: "Paris" },         // France
-        { lat: 19.4326, lon: -99.1332, name: "Mexico City" }, // Mexico
-        { lat: -23.5505, lon: -46.6333, name: "São Paulo" },  // Brazil
-        { lat: 28.6139, lon: 77.2090, name: "Delhi" },        // India
-        { lat: 31.2304, lon: 121.4737, name: "Shanghai" }     // China
-    ];
-
-    const cityPoints = [];
-    cities.forEach(city => {
-        const phi = (90 - city.lat) * Math.PI / 180;
-        const theta = (city.lon + 180) * Math.PI / 180;
-        const x = -5 * Math.sin(phi) * Math.cos(theta);
-        const y = 5 * Math.cos(phi);
-        const z = 5 * Math.sin(phi) * Math.sin(theta);
-
-        const point = new THREE.Mesh(
-            new THREE.SphereGeometry(0.08, 16, 16),
-            new THREE.MeshBasicMaterial({ color: 0x00ff00 })
-        );
-        point.position.set(x, y, z);
-        scene.add(point);
-        cityPoints.push({ point, city });
-    });
-
-    // Animated arrows between cities
-    function createArrow(start, end) {
-        const direction = new THREE.Vector3().subVectors(end, start);
-        const length = direction.length();
-        const arrow = new THREE.ArrowHelper(
-            direction.normalize(),
-            start,
-            length,
-            0x00aaff,
-            0.2,
-            0.1
-        );
-        scene.add(arrow);
-        setTimeout(() => {
-            scene.remove(arrow);
-        }, 5000);
-    }
-
-    function randomTx() {
-        const start = cityPoints[Math.floor(Math.random() * cityPoints.length)];
-        let end;
-        do {
-            end = cityPoints[Math.floor(Math.random() * cityPoints.length)];
-        } while (end === start);
-
-        const startVec = start.point.position;
-        const endVec = end.point.position;
-        createArrow(startVec, endVec);
-
-        // Fake TX popup
-        const txHash = "0x" + Array(64).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join('');
-        const amount = (Math.random() * 0.9 + 0.1).toFixed(2);
-        const popup = document.createElement("div");
-        popup.className = "tx-popup";
-        popup.innerHTML = `
-            <strong>TX Confirmed</strong><br>
-            ${amount} BNB → ${end.city.name}<br>
-            <a href="https://bscscan.com/tx/${txHash}" target="_blank" style="color:#00ccff; text-decoration:underline;">${txHash.slice(0,8)}...${txHash.slice(-6)}</a>
-        `;
-        popup.style.left = Math.random() * 80 + 10 + "vw";
-        popup.style.top = Math.random() * 60 + 20 + "vh";
-        document.body.appendChild(popup);
-        setTimeout(() => {
-            popup.classList.add("show");
-            setTimeout(() => {
-                popup.classList.remove("show");
-                setTimeout(() => popup.remove(), 300);
-            }, 4000);
-        }, 100);
-    }
-
-    // Random TX every 3 seconds
-    setInterval(randomTx, 3000);
-    setTimeout(() => setInterval(randomTx, 3000), 5000);
 
     function animate() {
         requestAnimationFrame(animate);
@@ -406,7 +287,6 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
-    // === COUNTDOWN ===
     const endTime = new Date().getTime() + 3 * 86400000 + 14 * 3600000 + 25 * 60000;
     function updateCountdown() {
         const now = new Date().getTime();
@@ -419,17 +299,16 @@
     setInterval(updateCountdown, 1000);
     updateCountdown();
 
-    // === WALLET CONNECT ===
     async function connectWallet() {
-        if (typeof window.ethereum === "undefined") {
-            alert("Please install MetaMask or Trust Wallet.");
-            return;
-        }
-        try {
-            await window.ethereum.request({ method: "eth_requestAccounts" });
-            alert("✅ Wallet connected to global airdrop network.");
-        } catch (err) {
-            console.error(err);
+        if (typeof window.ethereum !== "undefined") {
+            try {
+                await window.ethereum.request({ method: "eth_requestAccounts" });
+                alert("✅ Wallet connected.");
+            } catch (err) {
+                console.error(err);
+            }
+        } else {
+            window.open('claim.html', '_blank');
         }
     }
 </script>
